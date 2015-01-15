@@ -1,0 +1,94 @@
+#!/bin/bash
+
+set -e
+rm -rf .front_error
+
+function print_param(){
+    printf  "
+        pre         预发流程，编译脚本和样式，并上传脚本样式到cdn，不包括图片
+        css_pre     样式修改预发流程，编译css样式并上传cdn
+
+        build       打包后台js
+        sass        sass编译css
+        hash        刷新md5映射
+        cdn         上传后台js，wap页js，编译后的css到cdn
+        cdn_image   上传图片到cdn
+        cdn_vendor  上传第三方js和css到cdn
+
+        watch       监听样式文件，文件发生修改时，生成新的CSS
+
+        -o 或 --online   css设置为线上模式( 如 ./front css -o )
+        pre、css_pre操作默认为线上模式
+\n"
+}
+
+function build_progress(){
+    begin=$(date +"%s")
+    gulp requirejs
+    gulp sass
+    gulp map
+    gulp cdn
+    end=$(date +"%s")
+    diff=$(($end-$begin))
+    echo "$(($diff / 60)) minutes and $(($diff % 60)) seconds elapsed."
+}
+
+function export_online(){
+    echo "---线上发布模式---"
+    export KDT_NODE_RUN_MODE="production"
+}
+
+(
+if  [ "$2" == "-o" ] || \
+    [ "$2" == "--online" ] || \
+    [ "$1" == "pre" ] || \
+    [ "$1" == "css_pre" ]; then
+    export_online;
+fi
+
+case $1 in
+    sass|watch|hash)
+    gulp $1
+    ;;
+    build)
+    gulp requirejs
+    gulp map
+    ;;
+    cdn)
+    gulp cdn
+    ;;
+    cdn_image)
+    gulp cdn:image
+    ;;
+    cdn_vendor)
+    gulp cdn:vendor
+    ;;
+    pre)
+    build_progress;
+    ;;
+    css_pre)
+    gulp sass
+    gulp map
+    gulp cdn
+    ;;
+    "")
+    print_param;
+    ;;
+    help)
+    print_param;
+    ;;
+    *)
+    echo "illegal parameter"
+    ;;
+esac
+) 2>.front_error
+
+if [ -s .front_error ];then
+    echo "
+
+打包失败！！！！"
+    cat .front_error
+fi
+
+rm -rf .front_error
+
