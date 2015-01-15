@@ -47,11 +47,14 @@ if  [ "$2" == "-o" ] || \
 fi
 
 case $1 in
-    sass|watch|hash)
+    sass|watch)
     gulp $1
     ;;
     build)
     gulp requirejs
+    gulp map
+    ;;
+    hash)
     gulp map
     ;;
     cdn)

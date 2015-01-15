@@ -200,7 +200,7 @@ gulp.task('sass', env.cssCompress ? ['clean:sass'] : null, function(){
                 return path.relative(pathConfig.static, item);
             });
 
-            targetPath = path.join(sr('.'), '..', 'version.php');
+            targetPath = path.join(sr('.'), '../config', 'version.php');
             printVersionMap(targetPath, data);
         })
         .fail(function(reason){
