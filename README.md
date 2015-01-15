@@ -16,7 +16,8 @@
       front
       gulpfile.js
       package.json
-      version.php
+      /config
+      	  version.php
       /static
           /asset
               /img
