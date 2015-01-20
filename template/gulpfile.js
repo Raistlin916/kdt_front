@@ -76,7 +76,7 @@ gulp.task('sass', env.cssCompress ? ['clean:sass'] : null, function(){
         return gulp.src(pathConfig.sass)
             .pipe(sass({
                 includePaths: ['sass'],
-                imagePath: pathConfig.sassImagePath,
+                imagePath: path.join('..', pathConfig.sassImagePath),
                 outputStyle: 'compressed'
             }))
             .pipe(gulpMd5(10))
